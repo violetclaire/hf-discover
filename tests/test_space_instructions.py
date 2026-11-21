@@ -1,5 +1,5 @@
 from email.message import Message
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 
 import pytest
 
@@ -58,3 +58,15 @@ def test_missing_repository_file_propagates() -> None:
     with pytest.raises(HTTPError):
         fetch_agents_md("alice/static-space", read=read)
     assert len(calls) == 2
+
+
+def test_network_errors_do_not_trigger_fallback() -> None:
+    calls: list[str] = []
+
+    def read(url: str) -> str:
+        calls.append(url)
+        raise URLError("unreachable")
+
+    with pytest.raises(URLError):
+        fetch_agents_md("alice/static-space", read=read)
+    assert len(calls) == 1
