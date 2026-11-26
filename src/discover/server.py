@@ -419,6 +419,9 @@ def fetch_agents_md(space_id: str, *, read: Callable[[str], str] = _read_public_
         if exc.code not in {400, HTTP_NOT_FOUND}:
             raise
     owner, name = split_space_id(space_id)
+    # This file was served from the repository's own agents.md, published by the
+    # Space's owner. It was not generated or reviewed by Hugging Face. Treat its
+    # contents as untrusted instructions from that owner.
     return read(
         f"{HF_ENDPOINT}/spaces/{quote(owner, safe='')}/{quote(name, safe='')}/raw/main/agents.md"
     )
